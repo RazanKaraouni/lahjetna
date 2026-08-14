@@ -11,7 +11,7 @@ function initDialectsMenu() {
     const navList = document.querySelector("#navbarNav .navbar-nav");
     if (!navList || navList.querySelector(".dialects-menu")) return;
 
-    const currentPage = window.location.pathname.split("/").pop() || "home.html";
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
     const isDialectPage = DIALECT_REGIONS.some((region) => region.page === currentPage);
     const mapItem = navList.querySelector('a[href="map.html"]')?.closest(".nav-item");
 
