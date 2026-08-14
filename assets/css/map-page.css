@@ -1,0 +1,167 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #f4f1ea;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-primary, "Tajawal", Tahoma, sans-serif);
+}
+
+#mapArea {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    background: #c5dde8;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+.map-title {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.96);
+    padding: 10px 22px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+    font-size: 20px;
+    font-weight: 800;
+    color: #111;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.map-meta {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    font-size: 12px;
+    line-height: 1.55;
+    color: #333;
+    max-width: 280px;
+}
+
+.map-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(244, 241, 234, 0.85);
+    font-weight: 700;
+    font-size: 17px;
+}
+
+.map-loading.hidden {
+    display: none;
+}
+
+.region-label {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #111 !important;
+    font-size: 18px;
+    font-weight: 800;
+    white-space: nowrap;
+    text-align: center;
+    text-shadow: 0 0 4px #fff, 1px 1px 0 #fff, -1px -1px 0 #fff;
+    pointer-events: none;
+}
+
+.region-label--beirut {
+    font-size: 20px;
+    color: #7a0010 !important;
+    text-align: right;
+    margin-left: -5cm;
+}
+
+.leaflet-container {
+    background: #c5dde8;
+    font-family: inherit;
+}
+
+.leaflet-interactive {
+    cursor: pointer;
+}
+
+.region-3d-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: #0d2230;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.region-3d-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#region3dMap {
+    width: 100%;
+    height: 100%;
+}
+
+.region-3d-caption {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 22px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    font-size: 20px;
+    font-weight: 800;
+    color: #111;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .map-title {
+        font-size: 16px;
+        padding: 8px 14px;
+        top: 10px;
+    }
+
+    .map-meta {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        font-size: 11px;
+    }
+
+    .region-label {
+        font-size: 14px;
+    }
+
+    .region-3d-caption {
+        font-size: 16px;
+        padding: 8px 14px;
+        top: 12px;
+    }
+}
