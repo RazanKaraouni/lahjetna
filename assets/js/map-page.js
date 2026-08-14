@@ -21,13 +21,67 @@
         south: "south.html"
     };
 
-    var REGION_ZOOM = {
-        beirut: 13.4,
-        mountain: 10.2,
-        north: 10,
-        bekaa: 10,
-        "west-bekaa": 10.6,
-        south: 10.2
+    var REGION_3D = {
+        beirut: {
+            zoom: 15.1,
+            pitch: 64,
+            bearing: 72,
+            terrain: 0.45,
+            fillOpacity: 0.04,
+            duration: 2600,
+            hold: 4600,
+            offset: { lng: -0.018, lat: -0.004 }
+        },
+        mountain: {
+            zoom: 10.2,
+            pitch: 58,
+            bearing: -18,
+            terrain: 1.9,
+            fillOpacity: 0.1,
+            duration: 2400,
+            hold: 3400,
+            offset: { lng: 0, lat: 0 }
+        },
+        north: {
+            zoom: 10,
+            pitch: 56,
+            bearing: -18,
+            terrain: 1.8,
+            fillOpacity: 0.1,
+            duration: 2400,
+            hold: 3400,
+            offset: { lng: 0, lat: 0 }
+        },
+        bekaa: {
+            zoom: 10,
+            pitch: 55,
+            bearing: -12,
+            terrain: 1.5,
+            fillOpacity: 0.1,
+            duration: 2400,
+            hold: 3400,
+            offset: { lng: 0, lat: 0 }
+        },
+        "west-bekaa": {
+            zoom: 10.6,
+            pitch: 55,
+            bearing: -12,
+            terrain: 1.6,
+            fillOpacity: 0.1,
+            duration: 2400,
+            hold: 3400,
+            offset: { lng: 0, lat: 0 }
+        },
+        south: {
+            zoom: 10.2,
+            pitch: 56,
+            bearing: -18,
+            terrain: 1.6,
+            fillOpacity: 0.1,
+            duration: 2400,
+            hold: 3400,
+            offset: { lng: 0, lat: 0 }
+        }
     };
 
     // Beirut label sits just west of the tiny city polygon
@@ -141,7 +195,7 @@
         if (page) window.location.href = page;
     }
 
-    function openRegion3D(feature, featureLayer, geojson) {
+    function openRegion3D(feature, featureLayer) {
         var id = feature.properties.region_id;
         var page = REGION_PAGES[id];
         if (!page) return;
@@ -151,7 +205,12 @@
             return;
         }
 
-        var center = featureLayer.getBounds().getCenter();
+        var cam = REGION_3D[id] || REGION_3D.mountain;
+        var boundsCenter = featureLayer.getBounds().getCenter();
+        var center = [
+            boundsCenter.lng + (cam.offset.lng || 0),
+            boundsCenter.lat + (cam.offset.lat || 0)
+        ];
         var selectedOnly = {
             type: "FeatureCollection",
             features: [feature]
@@ -170,14 +229,13 @@
             style: {
                 version: 8,
                 sources: {
-                    osm: {
+                    satellite: {
                         type: "raster",
                         tiles: [
-                            "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                         ],
                         tileSize: 256,
-                        attribution:
-                            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        attribution: "Tiles © Esri"
                     },
                     terrain: {
                         type: "raster-dem",
@@ -188,10 +246,6 @@
                         tileSize: 256,
                         maxzoom: 15
                     },
-                    mask: {
-                        type: "geojson",
-                        data: maskOutsideLebanon(geojson)
-                    },
                     selected: {
                         type: "geojson",
                         data: selectedOnly
@@ -201,25 +255,16 @@
                     {
                         id: "background",
                         type: "background",
-                        paint: { "background-color": "#c5dde8" }
+                        paint: { "background-color": "#1b3a4a" }
                     },
-                    { id: "osm", type: "raster", source: "osm" },
+                    { id: "satellite", type: "raster", source: "satellite" },
                     {
                         id: "hillshade",
                         type: "hillshade",
                         source: "terrain",
                         paint: {
-                            "hillshade-exaggeration": 0.55,
+                            "hillshade-exaggeration": id === "beirut" ? 0.2 : 0.5,
                             "hillshade-illumination-anchor": "viewport"
-                        }
-                    },
-                    {
-                        id: "mask",
-                        type: "fill",
-                        source: "mask",
-                        paint: {
-                            "fill-color": "#c5dde8",
-                            "fill-opacity": 1
                         }
                     },
                     {
@@ -228,7 +273,7 @@
                         source: "selected",
                         paint: {
                             "fill-color": COLORS[id] || "#ffffff",
-                            "fill-opacity": 0.12
+                            "fill-opacity": cam.fillOpacity
                         }
                     },
                     {
@@ -236,49 +281,87 @@
                         type: "line",
                         source: "selected",
                         paint: {
-                            "line-color": COLORS[id] || "#111111",
-                            "line-width": 3
+                            "line-color": "#ffffff",
+                            "line-width": id === "beirut" ? 4 : 3,
+                            "line-opacity": 0.95
                         }
                     }
                 ],
                 terrain: {
                     source: "terrain",
-                    exaggeration: 1.7
+                    exaggeration: cam.terrain
                 }
             },
-            center: [center.lng, center.lat],
-            zoom: 8,
-            pitch: 45,
-            bearing: -12,
+            center: center,
+            zoom: Math.max(cam.zoom - 2.4, 8),
+            pitch: 42,
+            bearing: cam.bearing,
             maxPitch: 85,
             interactive: false,
             attributionControl: true
         });
 
         glMap.on("load", function () {
+            glMap.resize();
+
             try {
                 glMap.setSky({
-                    "sky-color": "#87b8d4",
-                    "horizon-color": "#c5dde8",
+                    "sky-color": "#6ea8c9",
+                    "horizon-color": "#cfe3ee",
                     "fog-color": "#d7e6ee"
                 });
             } catch (err) {
                 // older MapLibre builds may not support setSky
             }
 
-            glMap.flyTo({
-                center: [center.lng, center.lat],
-                zoom: REGION_ZOOM[id] || 10.2,
-                pitch: 55,
-                bearing: -18,
-                duration: 2400,
+            try {
+                glMap.addSource("openmaptiles", {
+                    type: "vector",
+                    url: "https://tiles.openfreemap.org/planet"
+                });
+                glMap.addLayer(
+                    {
+                        id: "3d-buildings",
+                        type: "fill-extrusion",
+                        source: "openmaptiles",
+                        "source-layer": "building",
+                        minzoom: 13,
+                        paint: {
+                            "fill-extrusion-color": "#e8e4dc",
+                            "fill-extrusion-height": [
+                                "coalesce",
+                                ["to-number", ["get", "render_height"]],
+                                ["to-number", ["get", "height"]],
+                                14
+                            ],
+                            "fill-extrusion-base": [
+                                "coalesce",
+                                ["to-number", ["get", "render_min_height"]],
+                                ["to-number", ["get", "min_height"]],
+                                0
+                            ],
+                            "fill-extrusion-opacity": 0.94
+                        }
+                    },
+                    "selected-fill"
+                );
+            } catch (err) {
+                console.warn("[Lahjetna] 3D buildings skipped", err);
+            }
+
+            glMap.easeTo({
+                center: center,
+                zoom: cam.zoom,
+                pitch: cam.pitch,
+                bearing: cam.bearing,
+                duration: cam.duration,
                 essential: true
             });
         });
 
         window.setTimeout(function () {
             window.location.href = page;
-        }, 3200);
+        }, cam.hold);
     }
 
     fetch(GEOJSON_URL)
