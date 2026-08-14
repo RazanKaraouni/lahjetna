@@ -41,7 +41,6 @@
     };
 
     var mapLoading = document.getElementById("mapLoading");
-    var mapMeta = document.getElementById("mapMeta");
     var overlay = document.getElementById("region3dOverlay");
     var overlayCaption = document.getElementById("region3dCaption");
 
@@ -350,17 +349,6 @@
             var bounds = layer.getBounds();
             map.fitBounds(bounds, { padding: [48, 48] });
             map.setMaxBounds(bounds.pad(0.05));
-
-            if (mapMeta && data.properties) {
-                mapMeta.innerHTML =
-                    "<strong>مصدر الحدود:</strong> geoBoundaries ADM2<br>" +
-                    "<strong>المساحة المحسوبة:</strong> " +
-                    data.properties.computed_total_km2 +
-                    " كم²<br>" +
-                    "<strong>الرسمية:</strong> " +
-                    data.properties.official_area_km2 +
-                    " كم²";
-            }
 
             console.log("[Lahjetna] regions loaded", data.properties);
             hideLoading();
