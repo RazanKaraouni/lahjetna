@@ -82,6 +82,16 @@ async function fetchPlaces() {
     throw lastErr;
 }
 
+function sanitizeLabel(value) {
+    if (value == null) return "";
+    return String(value)
+        .replace(/<[^>]*>/g, "")
+        .replace(/[<>"'`]/g, "")
+        .replace(/[\u0000-\u001F\u007F]/g, "")
+        .trim()
+        .slice(0, 200);
+}
+
 function findRegion(point, regions) {
     for (const region of regions.features) {
         if (turf.booleanPointInPolygon(point, region)) {
@@ -105,7 +115,7 @@ function findRegion(point, regions) {
         const placeType = tags.place;
         if (!["city", "town", "village"].includes(placeType)) continue;
 
-        const nameAr = tags["name:ar"] || tags.name || tags["name:en"];
+        const nameAr = sanitizeLabel(tags["name:ar"] || tags.name || tags["name:en"]);
         if (!nameAr) {
             skipped++;
             continue;
@@ -121,7 +131,7 @@ function findRegion(point, regions) {
         features.push(
             turf.point([el.lon, el.lat], {
                 name_ar: nameAr,
-                name_en: tags["name:en"] || tags.name || null,
+                name_en: sanitizeLabel(tags["name:en"] || tags.name) || null,
                 region_id: region.region_id,
                 region_ar: region.name_ar,
                 population: tags.population ? Number(tags.population) || null : null,

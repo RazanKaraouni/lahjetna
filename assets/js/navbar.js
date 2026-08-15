@@ -7,6 +7,17 @@ const DIALECT_REGIONS = [
     { name: "الجنوب", page: "south.html" }
 ];
 
+function isSafePage(page) {
+    return typeof page === "string" && /^[a-z0-9_]+\.html$/.test(page);
+}
+
+function createEl(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text != null) el.textContent = text;
+    return el;
+}
+
 function initDialectsMenu() {
     const navList = document.querySelector("#navbarNav .navbar-nav");
     if (!navList || navList.querySelector(".dialects-menu")) return;
@@ -15,23 +26,35 @@ function initDialectsMenu() {
     const isDialectPage = DIALECT_REGIONS.some((region) => region.page === currentPage);
     const mapItem = navList.querySelector('a[href="map.html"]')?.closest(".nav-item");
 
-    const menuItem = document.createElement("li");
-    menuItem.className = "nav-item dropdown dialects-menu";
+    const menuItem = createEl("li", "nav-item dropdown dialects-menu");
 
-    menuItem.innerHTML = `
-        <a class="nav-link dropdown-toggle${isDialectPage ? " active" : ""}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            اللهجات
-        </a>
-        <ul class="dropdown-menu dropdown-menu-start dialects-dropdown">
-            ${DIALECT_REGIONS.map((region) => `
-                <li>
-                    <a class="dropdown-item${region.page === currentPage ? " active" : ""}" href="${region.page}">
-                        ${region.name}
-                    </a>
-                </li>
-            `).join("")}
-        </ul>
-    `;
+    const toggle = createEl(
+        "a",
+        "nav-link dropdown-toggle" + (isDialectPage ? " active" : ""),
+        "اللهجات"
+    );
+    toggle.href = "#";
+    toggle.setAttribute("role", "button");
+    toggle.setAttribute("data-bs-toggle", "dropdown");
+    toggle.setAttribute("aria-expanded", "false");
+
+    const dropdown = createEl("ul", "dropdown-menu dropdown-menu-start dialects-dropdown");
+
+    DIALECT_REGIONS.forEach((region) => {
+        if (!isSafePage(region.page)) return;
+        const item = document.createElement("li");
+        const link = createEl(
+            "a",
+            "dropdown-item" + (region.page === currentPage ? " active" : ""),
+            region.name
+        );
+        link.href = region.page;
+        item.appendChild(link);
+        dropdown.appendChild(item);
+    });
+
+    menuItem.appendChild(toggle);
+    menuItem.appendChild(dropdown);
 
     if (mapItem) {
         navList.insertBefore(menuItem, mapItem);

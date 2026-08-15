@@ -44,6 +44,15 @@
     var overlay = document.getElementById("region3dOverlay");
     var overlayCaption = document.getElementById("region3dCaption");
 
+    function escapeHtml(value) {
+        return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
     function hideLoading() {
         if (mapLoading) mapLoading.classList.add("hidden");
     }
@@ -137,13 +146,15 @@
 
     function goToRegionPage(feature) {
         var page = REGION_PAGES[feature.properties.region_id];
-        if (page) window.location.href = page;
+        if (page && /^[a-z0-9_]+\.html$/.test(page)) {
+            window.location.href = page;
+        }
     }
 
     function openRegion3D(feature, featureLayer, geojson) {
         var id = feature.properties.region_id;
         var page = REGION_PAGES[id];
-        if (!page) return;
+        if (!page || !/^[a-z0-9_]+\.html$/.test(page)) return;
 
         if (typeof maplibregl === "undefined") {
             goToRegionPage(feature);
@@ -305,7 +316,7 @@
                     var name = feature.properties.name_ar;
                     var area = feature.properties.area_km2;
                     featureLayer.bindTooltip(
-                        name + " — " + area + " كم²",
+                        escapeHtml(name) + " — " + escapeHtml(area) + " كم²",
                         { sticky: true, direction: "top" }
                     );
                     featureLayer.on("click", function (event) {
@@ -339,7 +350,7 @@
                         className:
                             "region-label" +
                             (id === "beirut" ? " region-label--beirut" : ""),
-                        html: feature.properties.name_ar,
+                        html: escapeHtml(feature.properties.name_ar),
                         iconSize: id === "beirut" ? [56, 28] : [140, 28],
                         iconAnchor: [id === "beirut" ? 56 : 70, 14]
                     })
