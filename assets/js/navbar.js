@@ -63,4 +63,26 @@ function initDialectsMenu() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", initDialectsMenu);
+function initGuessNavLink() {
+    const navList = document.querySelector("#navbarNav .navbar-nav");
+    if (!navList || navList.querySelector(".guess-nav-item")) return;
+
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    const item = createEl("li", "nav-item guess-nav-item");
+    const link = createEl(
+        "a",
+        "nav-link" + (currentPage === "guess.html" ? " active" : ""),
+        "احزر اللهجة"
+    );
+    link.href = "guess.html";
+    if (currentPage === "guess.html") {
+        link.setAttribute("aria-current", "page");
+    }
+    item.appendChild(link);
+    navList.appendChild(item);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    initDialectsMenu();
+    initGuessNavLink();
+});
