@@ -1,24 +1,31 @@
 const ACCENTS = [
-    { id: "beirut", name: "وسط بيروت", src: "assets/beirut.mp4" },
-    { id: "ashrafieh", name: "الأشرفية", src: "assets/ashrafieh.mp4" },
-    { id: "tareek", name: "طريق الجديدة", src: "assets/tareek-jdeede.mp4" },
-    { id: "trablos", name: "طرابلس", src: "assets/trablos.mp4" },
-    { id: "saida", name: "صيدا", src: "assets/saida.mp4" },
-    { id: "srifa", name: "صريفا", src: "assets/srifa.mp4" },
-    { id: "yatar", name: "ياطر", src: "assets/yatar.mp4" },
-    { id: "baalbeck", name: "بعلبك", src: "assets/baalbeck.mp4" },
-    { id: "hermel", name: "الهرمل", src: "assets/hermel.mp4" },
-    { id: "kaserwen", name: "كسروان", src: "assets/kaserwen.mp4" },
-    { id: "rashia", name: "راشيا", src: "assets/rashia.mp4" },
-    { id: "labaya", name: "لبايا", src: "assets/labaya.mp4" }
+    { id: "zahle", name: "زحلة", src: "assets/audios/zahleVoice.ogg" },
+    { id: "labaya", name: "لبايا", src: "assets/audios/labayaVoice.ogg" },
+    { id: "trablos", name: "طرابلس", src: "assets/audios/trablosVoice.ogg" },
+    { id: "aljabal", name: "الجبل", src: "assets/audios/aljabal.ogg" },
+    { id: "aljanoub", name: "الجنوب", src: "assets/audios/aljanoubVoice.ogg" }
 ];
 
-const DISTRACTORS = [
+const CHOICES = [
+    { id: "beirut", name: "بيروت" },
+    { id: "ashrafieh", name: "الأشرفية" },
+    { id: "tareek", name: "طريق الجديدة" },
+    { id: "trablos", name: "طرابلس" },
+    { id: "saida", name: "صيدا" },
+    { id: "yatar", name: "ياطر" },
+    { id: "baalbeck", name: "بعلبك" },
+    { id: "hermel", name: "الهرمل" },
+    { id: "kaserwen", name: "كسروان" },
+    { id: "rashia", name: "راشيا" },
+    { id: "labaya", name: "لبايا" },
+    { id: "zahle", name: "زحلة" },
+    { id: "baisour", name: "بيصور" },
+    { id: "aljabal", name: "الجبل" },
+    { id: "aljanoub", name: "الجنوب" },
     { id: "akkar", name: "عكار" },
     { id: "chouf", name: "الشوف" },
     { id: "aley", name: "عاليه" },
     { id: "maten", name: "المتن" },
-    { id: "zahle", name: "زحلة" },
     { id: "sahmar", name: "سحمر" }
 ];
 
@@ -28,7 +35,7 @@ function isAllowedMediaSrc(src) {
     if (!trimmed || trimmed.includes("\\") || trimmed.includes("..")) return false;
     if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) return false;
     if (trimmed.startsWith("//") || trimmed.startsWith("/")) return false;
-    return /^assets\/[A-Za-z0-9._-]+\.(mp4|mp3|wav|m4a|ogg)$/.test(trimmed);
+    return /^assets\/audios\/[A-Za-z0-9._-]+\.ogg$/.test(trimmed);
 }
 
 function shuffle(list) {
@@ -40,13 +47,6 @@ function shuffle(list) {
         items[j] = temp;
     }
     return items;
-}
-
-function formatTime(seconds) {
-    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return mins + ":" + String(secs).padStart(2, "0");
 }
 
 function resultCopy(score, total) {
@@ -61,9 +61,9 @@ function resultCopy(score, total) {
         return { title: "ممتاز!", message: "واضح إنك متعوّد تسمع لهجات لبنان." };
     }
     if (ratio >= 0.4) {
-        return { title: "مش بطّال", message: "قرّب، جرّب مرة تانية بعد ما تسمع شوي من الخريطة." };
+        return { title: "مش بطّال", message: "قرّب، جرّب مرة تانية بعد ما تشوف شوي من الخريطة." };
     }
-    return { title: "كمّل سماع", message: "استكشف الخريطة واسمع اللكنات، بعدين ارجع احزر." };
+    return { title: "كمّل سماع", message: "استكشف الخريطة وشوف اللكنات، بعدين ارجع احزر." };
 }
 
 function el(tag, className, text) {
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const total = answers.length;
         scoreText.textContent = "النقاط: " + score + " / " + total;
         progressText.textContent = answered === total
-            ? "خلصت كل التسجيلات"
+            ? "خلصت كل الأسئلة"
             : "جاوبت " + answered + " من " + total;
         progressBar.style.width = total ? ((answered / total) * 100) + "%" : "0%";
 
@@ -114,106 +114,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function bindPlayer(round, clip, playBtn) {
-        let seeking = false;
-        const seekBar = round.querySelector(".guess-seek");
-        const currentTimeEl = round.querySelector(".guess-current");
-        const durationTimeEl = round.querySelector(".guess-duration");
-
-        function setPlaying(playing) {
-            round.classList.toggle("is-playing", playing);
-            playBtn.classList.toggle("is-playing", playing);
-            playBtn.setAttribute("aria-label", playing ? "إيقاف التسجيل" : "تشغيل التسجيل");
-            playBtn.replaceChildren();
-            const icon = el("i", playing ? "fas fa-pause" : "fas fa-play");
-            icon.setAttribute("aria-hidden", "true");
-            playBtn.appendChild(icon);
-        }
-
-        playBtn.addEventListener("click", () => {
-            if (clip.paused) {
-                pauseOthers(clip);
-                clip.play().catch(() => {});
-            } else {
-                clip.pause();
-            }
-        });
-
-        round.querySelector(".guess-replay").addEventListener("click", () => {
-            pauseOthers(clip);
-            clip.currentTime = 0;
-            clip.play().catch(() => {});
-        });
-
-        clip.addEventListener("play", () => setPlaying(true));
-        clip.addEventListener("pause", () => setPlaying(false));
-        clip.addEventListener("ended", () => setPlaying(false));
-        clip.addEventListener("loadedmetadata", () => {
-            durationTimeEl.textContent = formatTime(clip.duration);
-        });
-        clip.addEventListener("timeupdate", () => {
-            if (seeking || !clip.duration) return;
-            seekBar.value = String((clip.currentTime / clip.duration) * 100);
-            currentTimeEl.textContent = formatTime(clip.currentTime);
-        });
-        seekBar.addEventListener("input", () => {
-            seeking = true;
-            if (!clip.duration) return;
-            clip.currentTime = (Number(seekBar.value) / 100) * clip.duration;
-            currentTimeEl.textContent = formatTime(clip.currentTime);
-        });
-        seekBar.addEventListener("change", () => {
-            seeking = false;
-        });
-    }
-
     function createRound(accent, roundIndex) {
         const round = el("article", "guess-card guess-round");
         round.dataset.roundIndex = String(roundIndex);
 
         const heading = el("p", "guess-prompt", "التسجيل " + (roundIndex + 1));
-        const player = el("div", "guess-player");
-        const clip = document.createElement("video");
-        clip.playsInline = true;
+        const player = el("div", "guess-player is-audio");
+        const clip = document.createElement("audio");
+        clip.controls = true;
         clip.preload = "metadata";
+        clip.setAttribute("aria-label", "تسجيل اللكنة " + (roundIndex + 1));
         if (isAllowedMediaSrc(accent.src)) clip.src = accent.src;
-
-        const playBtn = el("button", "guess-play");
-        playBtn.type = "button";
-        playBtn.setAttribute("aria-label", "تشغيل التسجيل");
-        const playIcon = el("i", "fas fa-play");
-        playIcon.setAttribute("aria-hidden", "true");
-        playBtn.appendChild(playIcon);
-
-        const waves = el("div", "guess-waves");
-        waves.setAttribute("aria-hidden", "true");
-        for (let i = 0; i < 5; i += 1) waves.appendChild(document.createElement("span"));
-
-        const timeRow = el("div", "guess-time-row");
-        const currentTimeEl = el("span", "guess-current", "0:00");
-        const seekBar = document.createElement("input");
-        seekBar.type = "range";
-        seekBar.className = "guess-seek";
-        seekBar.min = "0";
-        seekBar.max = "100";
-        seekBar.value = "0";
-        seekBar.step = "0.1";
-        seekBar.setAttribute("aria-label", "تقدم التسجيل");
-        const durationTimeEl = el("span", "guess-duration", "0:00");
-        timeRow.append(currentTimeEl, seekBar, durationTimeEl);
-
-        const replayBtn = el("button", "guess-replay");
-        replayBtn.type = "button";
-        const replayIcon = el("i", "fas fa-rotate-right");
-        replayIcon.setAttribute("aria-hidden", "true");
-        replayBtn.append(replayIcon, document.createTextNode(" إعادة السماع"));
-
-        player.append(clip, playBtn, waves, timeRow, replayBtn);
+        clip.addEventListener("play", () => pauseOthers(clip));
+        player.appendChild(clip);
 
         const choicesEl = el("div", "guess-choices");
         choicesEl.setAttribute("role", "group");
         choicesEl.setAttribute("aria-label", "خيارات اللكنة");
-        const pool = ACCENTS.concat(DISTRACTORS).filter((item) => item.id !== accent.id);
+        const pool = CHOICES.filter((item) => item.id !== accent.id);
         const options = shuffle([accent].concat(shuffle(pool).slice(0, 3)));
         options.forEach((option) => {
             const btn = el("button", "guess-choice", option.name);
@@ -244,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
         feedback.setAttribute("role", "status");
         round.append(heading, player, choicesEl, feedback);
         clips.push(clip);
-        bindPlayer(round, clip, playBtn);
         return round;
     }
 
