@@ -1,9 +1,10 @@
 const ACCENTS = [
-    { id: "zahle", name: "زحلة", src: "assets/audios/zahleVoice.ogg" },
-    { id: "labaya", name: "لبايا", src: "assets/audios/labayaVoice.ogg" },
-    { id: "trablos", name: "طرابلس", src: "assets/audios/trablosVoice.ogg" },
-    { id: "aljabal", name: "الجبل", src: "assets/audios/aljabal.ogg" },
-    { id: "aljanoub", name: "الجنوب", src: "assets/audios/aljanoubVoice.ogg" }
+    { id: "zahle", name: "زحلة", src: "assets/audios/zahleVoice.ogg", region: "bikaa.html" },
+    { id: "labaya", name: "لبايا", src: "assets/audios/labayaVoice.ogg", region: "west_bikaa.html" },
+    { id: "trablos", name: "طرابلس", src: "assets/audios/trablosVoice.ogg", region: "north.html" },
+    { id: "aljabal", name: "الجبل", src: "assets/audios/aljabal.ogg", region: "mountain.html" },
+    { id: "aljanoub", name: "الجنوب", src: "assets/audios/aljanoubVoice.ogg", region: "south.html" },
+    { id: "baalbeck", name: "بعلبك", src: "assets/audios/baalbeckVoice.ogg", region: "bikaa.html" }
 ];
 
 const CHOICES = [
@@ -36,6 +37,10 @@ function isAllowedMediaSrc(src) {
     if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) return false;
     if (trimmed.startsWith("//") || trimmed.startsWith("/")) return false;
     return /^assets\/audios\/[A-Za-z0-9._-]+\.ogg$/.test(trimmed);
+}
+
+function isSafePage(page) {
+    return typeof page === "string" && /^[a-z0-9_]+\.html$/.test(page);
 }
 
 function shuffle(list) {
@@ -131,6 +136,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const choicesEl = el("div", "guess-choices");
         choicesEl.setAttribute("role", "group");
         choicesEl.setAttribute("aria-label", "خيارات اللكنة");
+        const feedback = el("p", "guess-feedback");
+        feedback.setAttribute("role", "status");
+        const regionLink = document.createElement("a");
+        regionLink.className = "guess-btn guess-btn-ghost guess-region-link";
+        regionLink.hidden = true;
+        regionLink.textContent = "صفحة لهجة " + accent.name;
         const pool = CHOICES.filter((item) => item.id !== accent.id);
         const options = shuffle([accent].concat(shuffle(pool).slice(0, 3)));
         options.forEach((option) => {
@@ -148,7 +159,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         choiceBtn.classList.add("is-correct");
                     }
                 });
-                if (!correct) btn.classList.add("is-wrong");
+                if (!correct) {
+                    btn.classList.add("is-wrong");
+                    if (isSafePage(accent.region)) {
+                        regionLink.href = accent.region;
+                        regionLink.hidden = false;
+                    }
+                }
                 feedback.textContent = correct
                     ? "صحيح! هيدي لكنة " + accent.name
                     : "غلط… الصح " + accent.name;
@@ -158,9 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
             choicesEl.appendChild(btn);
         });
 
-        const feedback = el("p", "guess-feedback");
-        feedback.setAttribute("role", "status");
-        round.append(heading, player, choicesEl, feedback);
+        round.append(heading, player, choicesEl, feedback, regionLink);
         clips.push(clip);
         return round;
     }

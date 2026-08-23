@@ -243,6 +243,16 @@ body {
     color: var(--leb-red);
 }
 
+.guess-region-link {
+    display: none;
+    margin: 0 auto 8px;
+    min-width: min(100%, 280px);
+}
+
+.guess-region-link:not([hidden]) {
+    display: inline-flex;
+}
+
 .guess-score-big {
     font-size: clamp(2.4rem, 8vw, 3.4rem);
     font-weight: 800;
