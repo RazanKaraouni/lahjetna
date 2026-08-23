@@ -380,6 +380,15 @@ body {
     margin: 0;
 }
 
+.lahje-footer__links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+    column-gap: 28px;
+    row-gap: 2px;
+}
+
 .lahje-footer__links a,
 .lahje-footer__social a {
     display: inline-flex;
