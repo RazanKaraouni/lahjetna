@@ -197,14 +197,5 @@ document.addEventListener("DOMContentLoaded", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
-    const subscribeForm = document.getElementById("footerSubscribe");
-    const subscribeMsg = document.getElementById("footerSubscribeMsg");
-    subscribeForm?.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const email = document.getElementById("footerEmail");
-        if (email instanceof HTMLInputElement) email.value = "";
-        if (subscribeMsg) subscribeMsg.hidden = false;
-    });
-
     renderGame();
 });
