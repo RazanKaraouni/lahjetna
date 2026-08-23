@@ -78,6 +78,33 @@ function el(tag, className, text) {
     return node;
 }
 
+function celebrate(bigWin) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    document.querySelectorAll(".guess-confetti").forEach((node) => node.remove());
+    const layer = el("div", "guess-confetti" + (bigWin ? " is-jackpot" : ""));
+    layer.setAttribute("aria-hidden", "true");
+    const banner = el("p", "guess-confetti-banner", bigWin ? "لهججي أصيل!" : "صح!");
+    layer.appendChild(banner);
+    const colors = ["#ED1C24", "#07663a", "#f4c430", "#ffffff", "#0a8a4e", "#ff7a7a", "#ffd166"];
+    const count = bigWin ? 160 : 110;
+    for (let i = 0; i < count; i += 1) {
+        const piece = el("span", "guess-confetti-piece");
+        const size = 12 + Math.random() * 18;
+        piece.style.setProperty("--w", size.toFixed(0) + "px");
+        piece.style.setProperty("--h", (size * 1.45).toFixed(0) + "px");
+        piece.style.setProperty("--drift", (Math.random() * 220 - 110).toFixed(0) + "px");
+        piece.style.setProperty("--spin", (400 + Math.random() * 800).toFixed(0) + "deg");
+        piece.style.setProperty("--delay", (Math.random() * 0.2).toFixed(2) + "s");
+        piece.style.setProperty("--dur", (1.8 + Math.random() * 1.4).toFixed(2) + "s");
+        piece.style.background = colors[i % colors.length];
+        piece.style.left = (Math.random() * 100) + "%";
+        piece.style.top = (-12 - Math.random() * 25) + "vh";
+        layer.appendChild(piece);
+    }
+    document.body.appendChild(layer);
+    setTimeout(() => layer.remove(), bigWin ? 3200 : 2400);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const roundsEl = document.getElementById("rounds");
     const scoreText = document.getElementById("scoreText");
@@ -114,6 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
             resultScore.textContent = score + " / " + total;
             resultMessage.textContent = copy.message;
             summaryEl.hidden = false;
+            if (score === total) celebrate(true);
         } else {
             summaryEl.hidden = true;
         }
@@ -165,6 +193,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         regionLink.href = accent.region;
                         regionLink.hidden = false;
                     }
+                } else {
+                    btn.classList.add("is-pop");
+                    celebrate(false);
                 }
                 feedback.textContent = correct
                     ? "صحيح! هيدي لكنة " + accent.name
