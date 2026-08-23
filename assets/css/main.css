@@ -30,17 +30,18 @@ p, a, li, span, label, button, input, select, textarea {
     background-color: var(--leb-green);
     border-bottom: 4px solid var(--leb-red);
     flex-shrink: 0;
+    position: relative;
+    z-index: 2000;
+    overflow: visible;
     animation: navbarDropIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes navbarDropIn {
     from {
         opacity: 0;
-        transform: translateY(-12px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
@@ -65,6 +66,16 @@ p, a, li, span, label, button, input, select, textarea {
     margin-inline-start: 0.35em;
 }
 
+.custom-navbar .container,
+.custom-navbar .navbar-collapse,
+.custom-navbar .navbar-nav {
+    overflow: visible;
+}
+
+.custom-navbar .dialects-menu {
+    position: relative;
+}
+
 .custom-navbar .dropdown-menu.dialects-dropdown {
     background: var(--leb-white);
     border: none;
@@ -73,6 +84,7 @@ p, a, li, span, label, button, input, select, textarea {
     padding: 8px;
     min-width: 190px;
     margin-top: 10px;
+    z-index: 2001;
 }
 
 .custom-navbar .dropdown-item {

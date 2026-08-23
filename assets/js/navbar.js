@@ -36,7 +36,11 @@ function initDialectsMenu() {
     toggle.href = "#";
     toggle.setAttribute("role", "button");
     toggle.setAttribute("data-bs-toggle", "dropdown");
+    toggle.setAttribute("data-bs-display", "static");
     toggle.setAttribute("aria-expanded", "false");
+    toggle.addEventListener("click", (event) => {
+        event.preventDefault();
+    });
 
     const dropdown = createEl("ul", "dropdown-menu dropdown-menu-start dialects-dropdown");
 
@@ -60,6 +64,10 @@ function initDialectsMenu() {
         navList.insertBefore(menuItem, mapItem);
     } else {
         navList.appendChild(menuItem);
+    }
+
+    if (window.bootstrap && bootstrap.Dropdown) {
+        bootstrap.Dropdown.getOrCreateInstance(toggle);
     }
 }
 
