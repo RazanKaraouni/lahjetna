@@ -136,12 +136,7 @@ p, a, li, span, label, button, input, select, textarea {
 
 @media (max-width: 991px) {
     .custom-navbar .navbar-brand {
-        font-size: 1.35rem;
-        margin-inline-end: 0.35rem;
-    }
-
-    .custom-navbar .navbar-brand img {
-        max-height: 38px;
+        display: none;
     }
 
     .custom-navbar .navbar-nav {
@@ -155,10 +150,6 @@ p, a, li, span, label, button, input, select, textarea {
 }
 
 @media (max-width: 575px) {
-    .custom-navbar .navbar-brand span {
-        display: none;
-    }
-
     .custom-navbar .navbar-nav {
         font-size: 0.78rem !important;
     }
