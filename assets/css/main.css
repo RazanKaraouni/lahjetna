@@ -100,7 +100,6 @@ p, a, li, span, label, button, input, select, textarea {
     margin-bottom: 0;
     gap: 0.1rem;
     flex-shrink: 0;
-    font-size: 1.5rem !important;
 }
 
 .custom-navbar .navbar-nav .nav-link {
@@ -157,7 +156,7 @@ p, a, li, span, label, button, input, select, textarea {
 
     .custom-navbar .navbar-nav {
         flex-wrap: nowrap;
-        font-size: 1.15rem !important;
+        font-size: 0.85rem !important;
     }
 
     .custom-navbar .navbar-nav .nav-link {
@@ -185,7 +184,7 @@ p, a, li, span, label, button, input, select, textarea {
     .custom-navbar .navbar-nav {
         flex-wrap: wrap;
         justify-content: flex-end;
-        font-size: 0.95rem !important;
+        font-size: 0.72rem !important;
     }
 
     .custom-navbar .navbar-nav .nav-link {
