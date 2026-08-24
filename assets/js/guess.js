@@ -27,7 +27,7 @@ const CHOICES = [
     { id: "chouf", name: "الشوف" },
     { id: "aley", name: "عاليه" },
     { id: "maten", name: "المتن" },
-    { id: "sahmar", name: "سحمر" }
+    { id: "jeb_jannine", name: "جب جنين" }
 ];
 
 function isAllowedMediaSrc(src) {
