@@ -218,16 +218,15 @@ p, a, li, span, label, button, input, select, textarea {
 }
 
 .navbar-page-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     color: var(--leb-white);
     font-size: 1.35rem;
     font-weight: 700;
     white-space: nowrap;
-    text-align: center;
+    text-align: right;
     line-height: 1.2;
     pointer-events: none;
+    margin-inline-start: 14px;
+    flex-shrink: 0;
 }
 
 @media (max-width: 991px) {
