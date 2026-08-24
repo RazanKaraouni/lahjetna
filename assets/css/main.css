@@ -51,6 +51,10 @@ p, a, li, span, label, button, input, select, textarea {
     object-fit: contain;
 }
 
+.custom-navbar .navbar-brand span {
+    display: none;
+}
+
 .nav-link {
     color: rgba(255, 255, 255, 0.9) !important;
     transition: color 0.2s ease;
