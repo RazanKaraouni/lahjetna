@@ -134,12 +134,14 @@ p, a, li, span, label, button, input, select, textarea {
     color: var(--leb-white);
 }
 
-@media (max-width: 991px) {
-    .custom-navbar .navbar-brand {
-        display: none;
+@media (max-width: 1199px) {
+    .custom-navbar .navbar-brand,
+    .custom-navbar .navbar-brand.d-flex {
+        display: none !important;
     }
 
     .custom-navbar .navbar-nav {
+        flex-wrap: nowrap;
         font-size: 0.92rem !important;
     }
 
